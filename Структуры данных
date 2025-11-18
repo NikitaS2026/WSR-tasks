@@ -1,0 +1,31 @@
+let result = findBushById(3);
+if (result !== null) {
+    console.log(result);
+} else {
+    console.log("Куст не найден!");
+
+}
+let bushCatalog = [
+    { id: 1, name: "Сирень", price: 100 },
+    { id: 2, name: "Жасмин", price: 120 },
+    { id: 3, name: "Шиповник", price: 150 },
+    { id: 4, name: "Калина", price: 80 },
+    { id: 5, name: "Смородина", price: 90 }
+];
+
+function findBushById(id: number): object | null {
+    for (let i = 0; i < bushCatalog.length; i++) {
+        if (bushCatalog[i].id === id) {
+            console.log() bushCatalog[i];
+        }
+    }
+    console.log() null;
+}
+
+
+if (result !== null) {
+    console.log(result);
+} else {
+    console.log("Куст не найден!");
+}
+//сейчас неправильный вариант решения,сначала делал сам, но снёс потому что не запускалось,переделал частично через подсказки 
