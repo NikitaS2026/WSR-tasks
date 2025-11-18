@@ -1,0 +1,19 @@
+function getBushPriceSwitch(bushName: string) {
+    switch (bushName) {
+        case 'сирень':
+            console.log(100)
+            break
+        case 'жасмин':
+            console.log(120)
+            break
+        case 'шиповник':
+            console.log(150)
+            break
+        default:
+            console.log(80)
+    }
+}
+getBushPriceSwitch('сирень')
+getBushPriceSwitch('жасмин')
+getBushPriceSwitch('шиповник')
+getBushPriceSwitch('куст')
