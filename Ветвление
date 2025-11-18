@@ -1,0 +1,11 @@
+function getBushPriceIf(bushName: string): number {
+    if (bushName=='сирень') console.log(100)
+    else if (bushName=='жасмин') console.log(120)
+    else if (bushName=='шиповник') console.log(150)
+    else console.log(80)
+
+}
+getBushPriceIf('сирень')
+getBushPriceIf('жасмин')
+getBushPriceIf('шиповник')
+getBushPriceIf('куст')
