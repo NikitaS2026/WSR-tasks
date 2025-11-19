@@ -1,0 +1,85 @@
+import {boolean} from "hardhat/internal/core/params/argumentTypes";
+
+enum Rarity {
+    Common = "Common",
+    Rare = "Rare",
+    Legendary = "Legendary"
+}
+class Monkey {
+    id: number;
+    name: string;
+    age: number;
+    rarity: Rarity;
+    isSold: boolean = false;
+
+    constructor(id: number, name: string, age: number, rarity: Rarity) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.rarity = rarity;
+    }
+    getInfo(): string {
+        const status = this.isSold ? "продана" : "в продаже";
+        return `ID: ${this.id}, Имя: ${this.name}, Возраст: ${this.age}, Редкость: ${this.rarity}, Статус: ${status}`;
+    }
+
+    //продать мартышку
+    sell(): void {
+        this.isSold = true;
+    }
+}
+let m1 = new Monkey(1, "Милфа", 52, Rarity.Rare);
+console.log(m1.getInfo());
+//Статус: в продаже"
+
+//m1.sell();
+//console.log(m1.getInfo());
+//Статус: продана"
+
+let m2 = new Monkey(2, "Никитка", 18, Rarity.Rare);
+//console.log(m2.getInfo());
+
+m2.sell();
+console.log(m2.getInfo());
+
+let m3 = new Monkey(3, "АленаДжан", 2005, Rarity.Legendary);
+//console.log(m3.getInfo());
+
+m3.sell();
+console.log(m3.getInfo());
+
+let m4 = new Monkey(4, "Москвич", 2, Rarity.Legendary,);
+//console.log(m4.getInfo());
+
+m4.sell();
+console.log(m4.getInfo());
+
+let m5 =new Monkey(5, "Черножёпый", 30, Rarity.Common);
+console.log(m5.getInfo());
+
+//m5.sell();
+//console.log(m5.getInfo());
+
+let m6= new Monkey(6,"ЮляСосок", 18, Rarity.Legendary);
+console.log(m6.getInfo());
+
+//m6.sell();
+//console.log(m6.getInfo());
+
+let m7 =new Monkey(7,"Качёк",17,Rarity.Common);
+//console.log(m7.getInfo());
+
+m7.sell();
+console.log(m7.getInfo());
+
+let m8 =new Monkey(8,"Нащяльникаааааа", 28, Rarity.Legendary);
+//console.log(m8.getInfo());
+
+m8.sell();
+console.log(m8.getInfo());
+
+let m9 =new Monkey(9,"ОтецОлег", 29, Rarity.Common);
+//console.log(m9.getInfo());
+
+m9.sell();
+console.log(m9.getInfo());
