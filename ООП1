@@ -1,0 +1,184 @@
+import {boolean, string} from "hardhat/internal/core/params/argumentTypes";
+
+enum Rarity {
+    Common = "Common",
+    Rare = "Rare",
+    Legendary = "Legendary"
+}
+class Monkey {
+    id: number;
+    name: string;
+    age: number;
+    rarity: Rarity;
+    isSold: boolean = false;
+
+    constructor(id: number, name: string, age: number, rarity: Rarity) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.rarity = rarity;
+    }
+    getInfo(): string {
+        const status = this.isSold ? "продана" : "в продаже";
+        return `ID: ${this.id}, Имя: ${this.name}, Возраст: ${this.age}, Редкость: ${this.rarity}, Статус: ${status}`;
+    }
+
+    //продать мартышку
+    sell(): void {
+        this.isSold = true;
+    }
+}
+let m1 = new Monkey(1, "Милфа", 52, Rarity.Rare);
+console.log(m1.getInfo());
+//Статус: в продаже"
+
+//m1.sell();
+//console.log(m1.getInfo());
+//Статус: продана"
+
+let m2 = new Monkey(2, "Никитка", 18, Rarity.Rare);
+//console.log(m2.getInfo());
+
+m2.sell();
+console.log(m2.getInfo());
+
+let m3 = new Monkey(3, "АленаДжан", 2005, Rarity.Legendary);
+//console.log(m3.getInfo());
+
+m3.sell();
+console.log(m3.getInfo());
+
+let m4 = new Monkey(4, "Москвич", 2, Rarity.Legendary,);
+//console.log(m4.getInfo());
+
+m4.sell();
+console.log(m4.getInfo());
+
+let m5 =new Monkey(5, "Черножёпый", 30, Rarity.Common);
+console.log(m5.getInfo());
+
+//m5.sell();
+//console.log(m5.getInfo());
+
+let m6= new Monkey(6,"ЮляСосок", 18, Rarity.Legendary);
+console.log(m6.getInfo());
+
+//m6.sell();
+//console.log(m6.getInfo());
+
+let m7 =new Monkey(7,"Качёк",17,Rarity.Common);
+//console.log(m7.getInfo());
+
+m7.sell();
+console.log(m7.getInfo());
+
+let m8 =new Monkey(8,"Нащяльникаааааа", 28, Rarity.Legendary);
+//console.log(m8.getInfo());
+
+m8.sell();
+console.log(m8.getInfo());
+
+let m9 =new Monkey(9,"ОтецОлег", 29, Rarity.Common);
+//console.log(m9.getInfo());
+
+m9.sell();
+console.log(m9.getInfo());
+
+//задание 2 с композицией классов
+
+class MonkeyMarket {
+    monkeys: Monkey[] = [];
+
+    addMonkey(monkey: Monkey): void {
+        this.monkeys.push(monkey);
+    }
+
+    getAllMonkeys(): Monkey[] {
+        return this.monkeys;
+    }
+
+    getAvailableMonkeys(): Monkey[] {
+        return this.monkeys.filter(m => !m.isSold);
+    }
+
+    buyMonkey(id: number): string {
+        const monkey = this.monkeys.find(m => m.id === id);
+        if (!monkey) return `Мартышка с id=${id} не найдена.`;
+        if (monkey.isSold) return `Мартышка "${monkey.name}" уже продана.`;
+
+        monkey.sell();
+        return `Вы успешно купили мартышку "${monkey.name}"!`;
+    }
+}
+const market = new MonkeyMarket();
+market.addMonkey(m1);
+market.addMonkey(m2);
+market.addMonkey(m3);
+market.addMonkey(m4);
+market.addMonkey(m5);
+market.addMonkey(m6);
+market.addMonkey(m7);
+market.addMonkey(m8);
+market.addMonkey(m9);
+
+//ООП-1
+class RobotMonkey extends Monkey {
+    chipVersion: string;
+
+    constructor(id: number, name: string, age: number, rarity: Rarity,chipVersion: string) {
+        super(id,name,age,rarity)
+        this.chipVersion = chipVersion;
+    }
+    override getInfo(): string {
+        return `${super.getInfo()},чип версия: ${this.chipVersion}`;
+    }
+}
+const r1 = new RobotMonkey(10,"мега_ультра_супер_Алёна" ,20000000000,Rarity.Legendary,"v2005.9.5");
+const r2 = new RobotMonkey(11,"КиберОлег" ,18,Rarity.Legendary,"v10000000000000.100000000000.100000000000000000");
+const r3 = new RobotMonkey(12,"ЧёрныйРабСистемы" ,20000000000,Rarity.Legendary,"v0.1.0");
+const r4 = new RobotMonkey(13,"Юляшкер" ,20000000000,Rarity.Legendary,"v2007.05.27");
+const r5 = new RobotMonkey(14,"Неуч_Я" ,20000000000,Rarity.Legendary,"v2007.07.03");
+market.addMonkey(r1)
+market.addMonkey(r2)
+market.addMonkey(r3)
+market.addMonkey(r4)
+market.addMonkey(r5)
+
+class MagicMonkey extends Monkey {
+    manaPool : number;
+
+    constructor(id: number, name: string, age: number, rarity: Rarity,manaPool :number) {
+        super(id,name,age,rarity)
+        this.manaPool =manaPool ;
+    }
+    override getInfo(): string {
+        return `${super.getInfo()},хранилице заклинаний: ${this.manaPool}`;
+    }
+}
+const n1 = new MagicMonkey(15,"ГарикПотер",99,Rarity.Legendary, 1234562345)
+const n2 = new MagicMonkey(16,"ГарикХарламов",49,Rarity.Legendary, 1941-1945)
+const n3 = new MagicMonkey(17,"Еврей",0,Rarity.Legendary, 1941-1945)
+const n4 = new MagicMonkey(18,"Окака",1,Rarity.Legendary, 1111111111111111)
+const n5 = new MagicMonkey(19,"ПельменеПодаватель",18,Rarity.Legendary, 223322332233)
+const n6 = new MagicMonkey(20,"ВселяюЖалость",52,Rarity.Legendary, 123456789)
+market.addMonkey(n1)
+market.addMonkey(n2)
+market.addMonkey(n3)
+market.addMonkey(n4)
+market.addMonkey(n5)
+market.addMonkey(n6)
+
+console.log("Все мартышки:");
+console.log(market.getAllMonkeys().map(r => r.getInfo()).join("\n"));
+
+console.log("\nДоступные для покупки:");
+console.log(market.getAvailableMonkeys().map(r => r.getInfo()).join("\n"));
+
+console.log("\nПокупка мартышки с id=12:");
+console.log(market.buyMonkey(12));
+
+console.log("\nПокупка мартышки с id=19:");
+console.log(market.buyMonkey(17));
+
+console.log("\nПокупка той же мартышки снова:");
+console.log(market.buyMonkey(12));
