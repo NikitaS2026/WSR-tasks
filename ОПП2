@@ -1,0 +1,147 @@
+import {boolean, string} from "hardhat/internal/core/params/argumentTypes";
+
+
+interface ISellable {
+    price: number;
+    isSold: boolean;
+    sellItem(): void;
+    getInfo(): string;
+}
+
+enum Rarity {
+    Common = "Common",
+    Rare = "Rare",
+    Legendary = "Legendary"
+}
+class Banana implements ISellable {
+    id: number;
+    isSold: boolean = false;
+    price: number;
+
+    constructor(id: number, price: number) {
+        this.id = id;
+        this.price = price;
+    }
+    getInfo(): string {
+        const status = this.isSold ? "продана" : "в продаже";
+        return `ID: ${this.id}, Цена: ${this.price}, Статус: ${status}`;
+    }
+
+    sellItem(): void {
+        this.isSold = true;
+    }
+}
+class Monkey implements ISellable {
+    id: number;
+    name: string;
+    age: number;
+    rarity: Rarity;
+    isSold: boolean = false;
+    price: number;
+
+    constructor(id: number, name: string, age: number, rarity: Rarity, price: number) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.rarity = rarity;
+        this.price = price;
+    }
+    getInfo(): string {
+        const status = this.isSold ? "продана" : "в продаже";
+        return `ID: ${this.id}, Имя: ${this.name}, Возраст: ${this.age}, Редкость: ${this.rarity}, Цена: ${this.price}, Статус: ${status}`;
+    }
+
+    sellItem(): void {
+        this.isSold = true;
+    }
+}
+class Store {
+    items: ISellable[] = [];
+
+    addItem(item: ISellable): void {
+        this.items.push(item);
+    }
+
+    getAllItems(): ISellable[] {
+        return this.items;
+    }
+
+    getAvailableItems(): ISellable[] {
+        return this.items.filter(item => !item.isSold);
+    }
+
+    // Метод buyItem теперь принимает любой ISellable объект
+    buyItem(id: number): string {
+        const itemToBuy = this.items.find((item: any) => item.id === id);
+
+        if (!itemToBuy) {
+            return `Товар с id=${id} не найден.`;
+        }
+
+        if (itemToBuy.isSold) {
+            return `Товар уже продан.`;
+        }
+
+        itemToBuy.sellItem();
+        return `Вы успешно купили товар!`;
+    }
+}
+
+console.log("БАНАНЫ");
+let b1 = new Banana(1, 62);
+let b2 = new Banana(2, 222);
+let b3 = new Banana(3, 626098765);
+console.log(b1.getInfo());
+console.log(b2.getInfo());
+console.log(b3.getInfo());
+
+console.log("МАКАКИ");
+let m1 = new Monkey(1, "Милфа", 52, Rarity.Rare, 1200000);
+let m2 = new Monkey(2, "Никитка", 18, Rarity.Rare, 133);
+let m3 = new Monkey(3, "АленаДжан", 2005, Rarity.Legendary, 123456);
+let m4 = new Monkey(4, "Москвич", 2, Rarity.Legendary, 987654);
+let m5 = new Monkey(5, "Черножёпый", 30, Rarity.Common, 234567);
+let m6 = new Monkey(6, "ЮляСосок", 18, Rarity.Legendary, 45454);
+let m7 = new Monkey(7, "Качёк", 17, Rarity.Common, 123456789);
+let m8 = new Monkey(8, "Нащяльникаааааа", 28, Rarity.Legendary, 78787);
+let m9 = new Monkey(9, "ОтецОлег", 29, Rarity.Common, 5915);
+
+console.log(m1.getInfo());
+m2.sellItem();
+console.log(m2.getInfo());
+m3.sellItem();
+console.log(m3.getInfo());
+m4.sellItem();
+console.log(m4.getInfo());
+console.log(m5.getInfo());
+console.log(m6.getInfo());
+m7.sellItem();
+console.log(m7.getInfo());
+m8.sellItem();
+console.log(m8.getInfo());
+m9.sellItem();
+console.log(m9.getInfo());
+
+const market = new Store();
+market.addItem(m1);
+market.addItem(m2);
+market.addItem(m3);
+market.addItem(m4);
+market.addItem(m5);
+market.addItem(m6);
+market.addItem(m7);
+market.addItem(m8);
+market.addItem(m9);
+market.addItem(b1);
+
+console.log("\nСписок доступных товаров:");
+market.getAvailableItems().forEach(item => console.log(item.getInfo()));
+
+console.log("\nПокупка товара:");
+console.log(market.buyItem(1)); // Покупка c id=1
+console.log(market.buyItem(1)); // Повторная попытка
+console.log(market.buyItem(2)); // Покупка проданной
+console.log(market.buyItem(123)); // Несуществующий товар
+
+console.log("\nСписок доступных товаров после покупки:");
+market.getAvailableItems().forEach(item => console.log(item.getInfo()));
