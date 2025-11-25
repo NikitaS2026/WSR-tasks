@@ -1,0 +1,105 @@
+class Car {
+    constructor(public brand: string, public model: string) {}
+}
+class  Moskvith extends Car {
+    constructor() {
+        super("Moskvith", "fre");
+    }
+}
+class  RolsRois extends Car {
+    constructor() {
+        super("RolsRois","Gost" );
+    }
+}
+class  Aurus extends Car {
+    constructor() {
+        super("Aurus", "Senat");
+    }
+}
+class  Toyota extends Car {
+    constructor() {
+        super("Toyota", "Camry");
+    }
+}
+
+class  User {
+    Exem: boolean = false;
+    car: Car | null = null;
+    id: number;
+    name :string;
+
+    constructor(id:number,name:string) {
+         this.id =id;
+         this.name = name;
+     }
+}
+let u1 = new User(1,"Алена_два_соска");
+let u2 = new User(2,"Олег");
+let u3 = new User(3,"ЮляСосок");
+let u4 = new User(4,"Дерябка");
+let u5 = new User(5,"Никитка");
+let u6 = new User(6,"Любаня");
+
+
+
+class GAITI {
+     database: User[] = [];
+    getUser(Oleg:User) {
+        for (let i in this.database) {
+            if (this.database[i] == Oleg) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    takeExam(lox:User) {
+        // Выводим случайное целое число от 1 до 6
+        let num = Math.floor(Math.random() * 6) + 1
+        if (num == 1 || num == 2 || num == 3) {
+            lox.Exem = true;
+            this.database.push(lox);
+            console.log("Сдал ,АЙЛЕВ АЙ ТИГР");
+        } else {
+            console.log("Не сдал ,Лошара")
+        }
+    }
+}
+class ShopLevl{
+    sellCar(user:User) {
+        if(user.Exem == true){
+            let randomaiser = Math.floor(Math.random() * 4) + 1;
+
+            if (randomaiser == 1) {
+                user.car = new Moskvith();
+            }
+            else if (randomaiser == 2) {
+                user.car = new Toyota();
+            }
+            else if ( randomaiser== 3) {
+                user.car = new Aurus();
+            }
+            else if (randomaiser== 4) {
+                user.car = new RolsRois();
+            }
+            console.log(`Ответ магазина: ${user.car.brand}  ${user.car.model}`)
+        }
+        else {
+            console.log(` Ответ магазина: ${user.name},Отказ, у тебя прав нет!`)
+
+        }
+    }
+}
+const myGai = new GAITI();
+const namesList = ["Алена_соска", "Олег", "ЮляСосок", "Дерябка_Матиз", "Никитка", "Любаня"];
+const myShop = new ShopLevl ();
+let id = 1;
+for (let name of namesList) {
+   // let id = 1;
+    let newUser = new User(id,name);
+    console.log(`\n--- Кандидат: ${name} (ID: ${id})---`)
+    myGai.takeExam(newUser);
+    myShop.sellCar(newUser);
+    id++
+
+}
