@@ -1,0 +1,238 @@
+import {boolean, string} from "hardhat/internal/core/params/argumentTypes";
+
+
+interface ISellable {
+    price: number;
+    isSold: boolean;
+    sellItem(): void;
+    getInfo(): string;
+}
+
+enum Rarity {
+    Common = "Common",
+    Rare = "Rare",
+    Legendary = "Legendary"
+}
+class Banana implements ISellable {
+    id: number;
+    isSold: boolean = false;
+    price: number;
+
+    constructor(id: number, price: number) {
+        this.id = id;
+        this.price = price;
+    }
+    getInfo(): string {
+        const status = this.isSold ? "продана" : "в продаже";
+        return `ID: ${this.id}, Цена: ${this.price}, Статус: ${status}`;
+    }
+
+    sellItem(): void {
+        this.isSold = true;
+    }
+}
+class Monkey implements ISellable {
+    id: number;
+    name: string;
+    age: number;
+    rarity: Rarity;
+    isSold: boolean = false;
+    price: number;
+
+    constructor(id: number, name: string, age: number, rarity: Rarity, price: number) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.rarity = rarity;
+        this.price = price;
+    }
+    getInfo(): string {
+        const status = this.isSold ? "продана" : "в продаже";
+        return `ID: ${this.id}, Имя: ${this.name}, Возраст: ${this.age}, Редкость: ${this.rarity}, Цена: ${this.price}, Статус: ${status}`;
+    }
+
+    sellItem(): void {
+        this.isSold = true;
+    }
+}
+class Store {
+    items: ISellable[] = [];
+
+    addItem(item: ISellable): void {
+        this.items.push(item);
+    }
+
+    getAllItems(): ISellable[] {
+        return this.items;
+    }
+
+    getAvailableItems(): ISellable[] {
+        return this.items.filter(item => !item.isSold);
+    }
+
+    // Метод buyItem теперь принимает любой ISellable объект
+    buyItem(id: number): string {
+        const itemToBuy = this.items.find((item: any) => item.id === id);
+
+        if (!itemToBuy) {
+            return `Товар с id=${id} не найден.`;
+        }
+
+        if (itemToBuy.isSold) {
+            return `Товар уже продан.`;
+        }
+
+        itemToBuy.sellItem();
+        return `Вы успешно купили товар!`;
+    }
+}
+
+console.log("БАНАНЫ");
+let b1 = new Banana(1, 62);
+let b2 = new Banana(2, 222);
+let b3 = new Banana(3, 626098765);
+console.log(b1.getInfo());
+console.log(b2.getInfo());
+console.log(b3.getInfo());
+
+console.log("МАКАКИ");
+let m1 = new Monkey(1, "Милфа", 52, Rarity.Rare, 1200000);
+let m2 = new Monkey(2, "Никитка", 18, Rarity.Rare, 133);
+let m3 = new Monkey(3, "АленаДжан", 2005, Rarity.Legendary, 123456);
+let m4 = new Monkey(4, "Москвич", 2, Rarity.Legendary, 987654);
+let m5 = new Monkey(5, "Черножёпый", 30, Rarity.Common, 234567);
+let m6 = new Monkey(6, "ЮляСосок", 18, Rarity.Legendary, 45454);
+let m7 = new Monkey(7, "Качёк", 17, Rarity.Common, 123456789);
+let m8 = new Monkey(8, "Нащяльникаааааа", 28, Rarity.Legendary, 78787);
+let m9 = new Monkey(9, "ОтецОлег", 29, Rarity.Common, 5915);
+
+console.log(m1.getInfo());
+m2.sellItem();
+console.log(m2.getInfo());
+m3.sellItem();
+console.log(m3.getInfo());
+m4.sellItem();
+console.log(m4.getInfo());
+console.log(m5.getInfo());
+console.log(m6.getInfo());
+m7.sellItem();
+console.log(m7.getInfo());
+m8.sellItem();
+console.log(m8.getInfo());
+m9.sellItem();
+console.log(m9.getInfo());
+
+const market = new Store();
+market.addItem(m1);
+market.addItem(m2);
+market.addItem(m3);
+market.addItem(m4);
+market.addItem(m5);
+market.addItem(m6);
+market.addItem(m7);
+market.addItem(m8);
+market.addItem(m9);
+market.addItem(b1);
+
+console.log("\nСписок доступных товаров:");
+market.getAvailableItems().forEach(item => console.log(item.getInfo()));
+
+console.log("\nПокупка товара:");
+console.log(market.buyItem(1)); // Покупка c id=1
+console.log(market.buyItem(1)); // Повторная попытка
+console.log(market.buyItem(2)); // Покупка проданной
+console.log(market.buyItem(123)); // Несуществующий товар
+
+console.log("\nСписок доступных товаров после покупки:");
+market.getAvailableItems().forEach(item => console.log(item.getInfo()));
+
+//задание взаимодействие с консолью
+import readline from "readline";
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+function showMenu() {
+    console.log("\nДобро пожаловать в наш киоск!");
+    console.log("1 - Узнать цену на мартышку");
+    console.log("2 - Узнать время работы");
+    console.log("3 - Получить смешной факт о мартышках");
+    console.log("exit - Выйти");
+}
+
+function handleCommand(command: string): boolean {
+    switch (command.trim()) {
+        case "1":
+            console.log("Редкая мартышка стоит 100 бананов.");
+            break;
+        case "2":
+            console.log("24/7 тигр");
+            break;
+        case "3":
+            console.log("Черножопую мортышку не видно ночью.",
+                "\nМакаки на Бали воруют очки и айфоны, а потом требуют еду как выкуп. Рэкетиры!",
+                "\nВ Индии обезьяну арестовали за то, что она угнала автобус и разбила его.",
+                "\nБабуины иногда воруют щенков и воспитывают их как своих питомцев.",
+                "\nОбезьяны в ЮАР научились заходить в дома и грабить холодильники, открывая их как люди.",
+                "\nШимпанзе могут планировать войну против соседней стаи. Стратеги, блин.",
+                "\nОднажды обезьяна отключила электричество во всей Кении, упав на трансформатор.",
+                "\nМартышки воруют алкогольные коктейли у туристов на пляжах. Любят халявную выпивку.",
+                "\nВ Таиланде есть 'шведский стол' для обезьян, где им накрывают поляну раз в год.",
+                "\nНекоторые обезьяны притворяются мертвыми, чтобы их не трогали.",
+                "\nЕсли дать обезьяне деньги, она попытается купить еду. Или проститутку (был такой эксперимент).",
+                 "\nОбезьяна по имени Коко знала 1000 слов на языке жестов и ругала людей, если они тупили.",
+                "\nШимпанзе могут играть в 'Камень, ножницы, бумага' на уровне ребенка.",
+                "\nОни умеют врать! Одна обезьяна закричала 'ЛЕОПАРД!', чтобы все убежали, а она съела торт.",
+                "\nКапуцины колят орехи камнями, используя наковальню. Кузнецы.",
+                "\nВ Японии обезьяны научились мыть картошку в соленой воде, потому что так вкуснее.",
+                "\nОбезьяны узнают себя в зеркале. Кошки и собаки — нет.",
+                "\nОни могут запоминать лица людей, которые их обидели, и мстить годами.",
+                "\nШимпанзе обыграли студентов университета в тесте на краткосрочную память.",
+                "\nОни используют палочки, чтобы выковыривать термитов. Первый столовый прибор.",
+                "\nНекоторые макаки научились покупать газировку в автоматах, кидая туда монетки.",
+                "\nОбезьяны чистят бананы не с 'хвостика', а с другой стороны. Мы всю жизнь ели неправильно.",
+                "\nОни любят пить забродивший сок фруктов, чтобы опьянеть.",
+                "\nГориллы съедают до 30 кг еды в день. Вечный массуха-набор.",
+                "\nНекоторые обезьяны ловят рыбу. Суши-мастера.",
+                "\nОни проверяют фрукты на спелость, сжимая их, как бабки на рынке.",
+                "\nПаукообразные обезьяны едят только спелые фрукты, гурманы хреновы.",
+                "\nШимпанзе иногда охотятся на других мелких обезьян. Каннибализм лайт.",
+                "\nОни могут пить воду, макая хвост в реку и облизывая его.",
+                "\nВ космос летали обезьяны. И возвращались героями.",
+                "\nОни ненавидят лимоны так же, как и мы. Морщатся жестко.",
+                "\nОбезьяны-ревуны орут так, что их слышно за 5 км.",
+                "\n У них есть отдельные слова для 'Орел', 'Змея' и 'Леопард'.",
+                "\nГелады 'болтают' друг с другом, используя ритм и интонацию, как рэперы.",
+                "\nГориллы напевают песенки себе под нос, когда едят вкусняшки.",
+                "\nОни смеются, если их щекотать. Боятся щекотки под мышками.",
+                "\nСтук в грудь у горилл — это не агрессия, а просто 'Смотри, какой я крутой'.",
+                "\nОбезьяны могут шептаться, чтобы не спалиться перед врагами.",
+                "\nНекоторые виды поют дуэтом по утрам. Караоке в джунглях.",
+                "\nШимпанзе стучат по корням деревьев, как по барабанам, отправляя смски.",
+                "\nМакаки скалят зубы не от улыбки, а от страха. Не улыбайся им в ответ!",);
+            break;
+        case "exit":
+            console.log("До свидания!");
+            return false;
+        default:
+            console.log("Я хз что это брат. Попробуй снова.");
+    }
+    return true;
+}
+
+function ask() {
+    rl.question("> ", (answer) => {
+        const shouldContinue = handleCommand(answer);
+        if (!shouldContinue) {
+            rl.close();
+            return;
+        }
+        showMenu();
+        ask();
+    });
+}
+
+showMenu();
+ask();
