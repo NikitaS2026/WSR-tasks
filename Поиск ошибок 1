@@ -1,0 +1,31 @@
+class Calc {
+     val: number;
+
+    constructor(v: number) {
+        this.val = v;
+    }
+     add(n: number): void {
+        this.val += n;
+    }
+    div(n: number): void {
+        if (n === 0) {
+            throw new Error("Низя на 0 делить дебила кусок");
+        }
+        this.val /= n;
+    }
+    show(): void {
+        console.log(` Показания ${this.val}`);
+    }
+}
+ function test() {
+    const c = new Calc(10);
+    c.add(5);
+
+    try {
+        c.div(0);
+    } catch (error) {
+        console.error("Ошибочка:", error.message);
+    }
+    c.show();
+}
+test()
