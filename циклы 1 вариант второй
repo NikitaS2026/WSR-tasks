@@ -1,0 +1,45 @@
+function calculateTotalPrice(shoppingList: string[]): number {
+    let total = 0;
+
+    for (let i = 0; i < shoppingList.length; i++) {
+        const bushName = shoppingList[i];
+        const price = getBushPrice(bushName);
+
+        if (price !== null) {
+            total += price;
+        }
+    }
+    return total;
+
+}
+type Bush = {
+    name:string;
+    price: number;
+
+}
+function getBushPrice(name: string): number {
+     let nextId: number = 1
+        nextId++;
+
+    const bushCatalog : Bush[] = [
+
+        {name:"Сирень",price: 100 },
+        {name:"Жасмин",price: 120 },
+        {name:"Шиповник",price: 150 },
+        {name:"Калина",price: 80 },
+        {name:"Смородина",price: 90 }
+    ];
+    for (let i = 0; i < bushCatalog.length; i++) {
+        if (bushCatalog[i].name === name) {
+            return bushCatalog[i].price;
+        }
+    }
+    return 0;
+
+
+}
+const order = ["Сирень", "Жасмин", "Шиповник"];
+
+console.log(calculateTotalPrice(order))
+const order52 = ["Сирень", "Калина"];
+console.log(calculateTotalPrice(order52))
