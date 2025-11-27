@@ -1,0 +1,35 @@
+class  ShopOleg{
+    mozgi:number[]
+
+    setMozgi(mozgiToSet:number[]) {
+        this. mozgi =mozgiToSet
+    }
+
+    getMozgi():number[] {
+        return this. mozgi
+    }
+
+}const olegShop = new ShopOleg();
+const mozgi: number[] = []
+mozgi.push(1)
+mozgi.push(52)
+mozgi.push(1234567)
+mozgi.push(100)
+mozgi.push(223344555556)
+mozgi.push(-10000)
+console.log(mozgi)
+for (let i = 0; i < mozgi.length; i++) {
+    if (mozgi[i] == -10000) {
+        console.log(`Мозги найдены ,они  ${i}`)
+        mozgi.splice(i, 1)
+        console.log(mozgi)
+    }
+}
+const massive: number[] = [525252525252]
+
+massive.push(1234567)
+massive[0] = 111111111111111111
+const saveMozg = massive[0]
+//massive.pop()
+console.log(saveMozg);
+console.log(massive);
