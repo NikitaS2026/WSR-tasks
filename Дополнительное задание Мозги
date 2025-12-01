@@ -1,0 +1,56 @@
+class  ShopOleg {
+    mozgi: number[] = []
+
+    setMozgi(mozgiToSet: number[]) {
+        this.mozgi = mozgiToSet
+    }
+
+    getMozgi(): number[] {
+        return this.mozgi
+    }
+
+    conclusionMozgi() {
+        console.log(this.mozgi)
+    }
+
+    IndexElement(value: number): number {
+        const index = this.mozgi.indexOf(value)
+        return index;
+    }
+
+    Olegg(legend:number,god:number) {
+        console.log("Олег красавчик ")
+        console.log(legend)
+        console.log(god)
+
+    }
+
+    Star(omg:number){
+        this.mozgi.push(omg)
+        console.log(omg)
+    }
+
+
+    delitByValue(mozgi1:number){
+        for (let i = 0; i < this.mozgi.length; i++) {
+            if (  this.mozgi[i] == mozgi1) {
+                console.log(`найдено под  индексом ${i}`)
+                this.mozgi.splice(i,1)
+            }
+
+        }
+    }
+    delitByIndex(mozgi2 :number){
+        this.mozgi.splice(mozgi2,1)
+    }
+
+}
+
+let shop = new ShopOleg()
+
+shop.Olegg(12321,1231)
+shop.Star(12)
+shop.Star(18882)
+shop.conclusionMozgi()
+shop.delitByIndex(0)
+shop.conclusionMozgi()
