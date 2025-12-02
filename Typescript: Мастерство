@@ -1,0 +1,195 @@
+import * as readline from 'readline/promises';
+import { stdin as input, stdout as output } from 'process';
+import * as path from "node:path";
+import * as fs from 'fs'
+enum Rarity {
+    Common = "Common",
+    Rare = "Rare",
+    Legendary = "Legendary"
+}
+class Monkey {
+    id: number;
+    name: string;
+    age: number;
+    rarity: Rarity;
+    isSold: boolean = false;
+
+    constructor(id: number, name: string, age: number, rarity: Rarity) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.rarity = rarity;
+    }
+
+    getInfo(): string {
+        const status = this.isSold ? "продана" : "в продаже";
+        return `ID: ${this.id}, Имя: ${this.name}, Возраст: ${this.age}, Редкость: ${this.rarity}, Статус: ${status}`;
+    }
+
+    sell(): void {
+        this.isSold = true;
+    }
+}
+
+class RobotMonkey extends Monkey {
+    chipVersion: string;
+    constructor(id: number, name: string, age: number, rarity: Rarity, chipVersion: string) {
+        super(id, name, age, rarity)
+        this.chipVersion = chipVersion;
+    }
+    override getInfo(): string {
+        return `${super.getInfo()}, чип версия: ${this.chipVersion}`;
+    }
+}
+
+class MagicMonkey extends Monkey {
+    manaPool: number;
+
+    constructor(id: number, name: string, age: number, rarity: Rarity, manaPool: number) {
+        super(id, name, age, rarity)
+        this.manaPool = manaPool;
+    }
+    override getInfo(): string {
+        return `${super.getInfo()}, нармана: ${this.manaPool}`;
+    }
+}
+class MonkeyMarket {
+    monkeys: Monkey[] = [];
+    private nextId: number = 21;
+
+    getMonkeys(): Monkey[] {
+        return this.monkeys;
+    }
+
+    setMonkeys(monkeys12: Monkey[]) {
+        this.monkeys = monkeys12;
+    }
+
+    addMonkey(monkey: Monkey): void {
+        this.monkeys.push(monkey);
+    }
+
+    // Новый метод: создает мартышку сам и дает ей авто-ID
+    addMonkeyFromConsole(name: string, age: number, rarityString: string): void {
+        const id = this.nextId++;
+
+        let rarity = Rarity.Common;
+        if (rarityString.toLowerCase() === 'rare') rarity = Rarity.Rare;
+        if (rarityString.toLowerCase() === 'legendary') rarity = Rarity.Legendary;
+
+        const newMonkey = new Monkey(id, name, age, rarity);
+        this.monkeys.push(newMonkey);
+        console.log(`\n Мартышка "${name}" добавлена с ID ${id}!`);
+    }
+    getAvailableMonkeys(): Monkey[] {
+        return this.monkeys.filter(m => !m.isSold);
+    }
+
+    buyMonkey(id: number): string {
+        const monkey = this.monkeys.find(m => m.id === id);
+        if (!monkey) return `Раб с id=${id} не найден, убежал.`;
+        if (monkey.isSold) return ` Раб "${monkey.name}" уже продан,опаздал дружочек.`;
+
+        monkey.sell();
+        return ` Вы успешно купили личного раба "${monkey.name}"!`;
+    }
+}
+const market = new MonkeyMarket();
+
+// Обычные
+market.addMonkey(new Monkey(1, "Милфа", 52, Rarity.Rare));
+market.addMonkey(new Monkey(2, "Никитка", 18, Rarity.Rare));
+market.addMonkey(new Monkey(3, "АленаДжан", 2005, Rarity.Legendary));
+market.addMonkey(new Monkey(4, "Москвич", 2, Rarity.Legendary));
+market.addMonkey(new Monkey(5, "Черножёпый", 30, Rarity.Common));
+market.addMonkey(new Monkey(6, "ЮляСосок", 18, Rarity.Legendary));
+market.addMonkey(new Monkey(7, "Качёк", 17, Rarity.Common));
+market.addMonkey(new Monkey(8, "Нащяльникаааааа", 28, Rarity.Legendary));
+market.addMonkey(new Monkey(9, "ОтецОлег", 29, Rarity.Common));
+
+// Роботы
+market.addMonkey(new RobotMonkey(10, "мега_ультра_супер_Алёна", 200, Rarity.Legendary, "v2005.9.5"));
+market.addMonkey(new RobotMonkey(11, "КиберОлег", 18, Rarity.Legendary, "v1.0"));
+market.addMonkey(new RobotMonkey(12, "ЧёрныйРабСистемы", 200, Rarity.Legendary, "v0.1.0"));
+market.addMonkey(new RobotMonkey(13, "Юляшкер", 200, Rarity.Legendary, "v2007.05.27"));
+market.addMonkey(new RobotMonkey(14, "Неуч_Я", 200, Rarity.Legendary, "v2007.07.03"));
+
+// Магические (15-20)
+market.addMonkey(new MagicMonkey(15, "ГарикПотер", 99, Rarity.Legendary, 123456));
+market.addMonkey(new MagicMonkey(16, "ГарикХарламов", 49, Rarity.Legendary, 1945));
+market.addMonkey(new MagicMonkey(17, "Еврей", 0, Rarity.Legendary, 1945));
+market.addMonkey(new MagicMonkey(18, "Окака", 1, Rarity.Legendary, 111111));
+market.addMonkey(new MagicMonkey(19, "ПельменеПодаватель", 18, Rarity.Legendary, 223322));
+market.addMonkey(new MagicMonkey(20, "ВселяюЖалость", 52, Rarity.Legendary, 123456789));
+
+// --- КОНСОЛЬНОЕ МЕНЮ ---
+
+async function main() {
+    const rl = readline.createInterface({ input, output });
+    let isRunning = true;
+
+    while (isRunning) {
+        console.log("\n👨🏿 MONKEY-RAB MARKET👨🏿 ");
+        console.log("1 - Добавить новую мартышку (Auto ID)");
+        console.log("2 - Показать всех доступных");
+        console.log("3 - Купить мартышку");
+        console.log("4- Сохранить рынок в файл");
+        console.log("5- Загрузить рынок из файла");
+        console.log("exit - Выйти");
+
+        const command = await rl.question("\nВаш выбор > ");
+
+        switch (command.trim()) {
+            case "1":
+                // Тут мы спрашиваем данные по очереди
+                const name = await rl.question("Имя мартышки: ");
+                const ageStr = await rl.question("Возраст: ");
+                const rarityStr = await rl.question("Редкость (Common/Rare/Legendary): ");
+
+                const age = parseInt(ageStr) || 0;
+                market.addMonkeyFromConsole(name, age, rarityStr);
+                break;
+            case "2":
+                const available = market.getAvailableMonkeys();
+                console.log("\n🏎️NIGGA_MONKEY Магазин(Черный рынок)🏎️" );
+                // Красивый вывод таблицы
+                console.table(available, ['id', 'name', 'age', 'rarity', 'chipVersion', 'manaPool']);
+                break;
+
+            case "3":
+                const idStr = await rl.question("Введите ID мартышки: ");
+                const result = market.buyMonkey(parseInt(idStr));
+                console.log(result);
+            case "4":
+                const dataSave = JSON.stringify(market.getMonkeys());
+                console.log(dataSave);
+                const file1 = path.join(__dirname,"..","monkeys_data.json")
+                fs.writeFileSync(file1,dataSave);
+                console.log(`Сохранено `)
+                console.log(`Путь к мартыхе: ${file1}`)
+                console.log(`Данные: ${dataSave} `);
+                break;
+            case "5":
+                const filePath =   path.join(__dirname,"..","monkeys_data.json");
+                const data = fs.readFileSync(filePath).toString()
+                const dataS = JSON.parse(data)
+                console.log(dataS)
+                if (fs.existsSync(filePath))
+                    market.setMonkeys(dataS)
+                    console.log(`загружено `)
+                break
+
+            case "exit":
+                console.log("🥺Пакеда!🥺 Приходите за людьми,шучу, за бананами.🥺");
+                isRunning = false;
+                break;
+
+            default:
+                console.log("💔Я хз что это брат. Попробуй снова.💔");
+        }
+    }
+    rl.close();
+}
+
+// Запуск
+main();1
