@@ -1,0 +1,18 @@
+import { ethers } from "hardhat"
+async function main() {
+        const [deployer] = await ethers.getSigners();
+        console.log("Адрес деплоера:", deployer.address);
+        const Lock = await ethers.getContractFactory("Lock");
+        // Lock требует unlockTime — даём например, текущее время + 1 час, главный вопрос зачем
+        const unlockTime = Math.floor(Date.now() / 1000) + 3600;
+
+        const lock = await Lock.deploy(unlockTime);
+        await lock.waitForDeployment();
+
+        console.log("Lock.sol развернут по адресу:", lock.target);
+        console.log("🧱Полигон для кирпичного завода готов!🧱");
+    }
+
+    main().catch((error) => {
+        console.error(error);
+    })
