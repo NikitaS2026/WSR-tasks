@@ -1,0 +1,24 @@
+import hre from "hardhat";
+import {Bricks__factory} from "../typechain-types";
+
+async  function maamamia(){
+
+    const accounts = await hre.ethers.getSigners();
+    const Bricks = await hre.ethers.getContractFactory("Bricks");
+    const Brickss = await Bricks.deploy()
+    await Brickss.waitForDeployment()
+
+    await Brickss.mint(accounts[6],1000)
+    const Balance = await Brickss.balanceOf(accounts[6]);
+    console.log("Баланс пользователя:", Balance)
+
+    try {
+        await Brickss.connect(accounts[1]).mint(accounts[1],1000)
+    } catch (e) {
+        console.log(e)
+    }
+
+    console.log(await Brickss.balanceOf(accounts[1]))
+
+}
+maamamia()
