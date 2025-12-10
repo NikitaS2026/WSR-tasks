@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract ERC20 {
+ //Определение событий-Events.Transfer-работает при каждолм переводе токенов.indexed-поиск и фильтрация параметров.
+    event Transfer(address indexed from, address indexed to, uint256 amount);
+    event Approval(address indexed from, address indexed to, uint256 amount);
+//mapping- Карта, которая связывает адрес address .public-автоматически создает функцию для чтения баланса любого адреса.
+
+    mapping (address => uint256) public balanceOf;
+
+    mapping (address => mapping(address => uint256)) public allowance;
+//общее количество токенов
+    uint256 public totalSupply; 
+    address public owner;//адрес владельца
+    string public name;//имя токена
+    uint256 public decimals;//количество после запятой 
+    string public symbol;//символ токена
+    //Конструктор: Функция, которая выполняется только один раз, при первом развертывании контракта.
+    constructor(string memory _name, string memory _symbol, uint256 _decimals) {
+        name = _name;//имя 
+        symbol = _symbol;//символ
+        decimals = _decimals;//десятичные дроби
+        owner = msg.sender;// Устанавливает адрес, который развернул контракт, как владельца.
+    }
+
+//функция создания  публичная 
+    function mint(address addressToMint, uint256 amount) public {
+        require(msg.sender == owner, "Only owner can do this");//pequire- проверяет условие: только владелец контракта может вызвать эту функцию. 
+        balanceOf[addressToMint] += amount;//увеличивает баланс именно этого адреса 
+        totalSupply += amount;//увеличивает общий баланс
+    }
+
+    function burn(address addressFrom, uint256 amount) public {//функция уничитожения токенов кому и кем а также сколько , публичная 
+        require(msg.sender == owner, "Only owner can do this");//опять таки только владелец может уничтожить токены
+        balanceOf[addressFrom] -= amount;//уменьшает баланс именно этого адреса
+        totalSupply -= amount;//уменьшает общий баланс
+    }
+// функция перевода токенов от меня к другому адресу и количество ,публичная
+    function transfer(address to, uint256 amount) public {
+        require(balanceOf[msg.sender] >= amount, "Not enough amount");//проверяет что у отправителя достаточно мани в кармани
+        emit Transfer(msg.sender, to, amount);//создает с обытие трансфер
+        balanceOf[msg.sender] -= amount;//умаеньшает баланс отправителя 
+        balanceOf[to] += amount;//увеличивает баланс покупателя
+
+    }
+//функция allow переводит токены от меня к другому адресу  и количество,публично
+    function allow(address to, uint256 amount) public {
+        require(balanceOf[msg.sender] >= amount, "Not enough amount");//проверяет что бы баланс был больше или равен запрашиваемой сумме или высветит ошибку "недостаточно средств"
+        emit Approval(msg.sender, to, amount);//создаёт событие Одобрение с указанием отправителя и получателя.
+        allowance[msg.sender][to] += amount;//Увеличить запись в реестре разрешений для этой пары адресов на указанную сумму.
+    }
+    
+//функция transferFrom с указанием адреса отправления и получения и количество,публичная 
+    function transferFrom(address from, address to, uint256 amount) public  {
+        require(balanceOf[from] >= amount, "Not enough balance");//требует что бы у адреса был достаточный баланс,если нет то выдает ошибку
+        require(allowance[from][msg.sender] >= amount, "Not enough allowance");//требует что бы адрес имел разрешение потратить сумму,если нет то выдает ошибку
+        emit Transfer(from, to, amount);//сгенерировать событие перевод и уведомлять обо всех перемещениях
+        balanceOf[from] -= amount;//вычесть сумму из баланса
+        balanceOf[to] += amount;//прибавить суммцу к балансу 
+        allowance[from][msg.sender] -= amount;//вычесть сумму из оставшегося разрешения,что бы нельзя было поторатить его дважды
+    }
+}
