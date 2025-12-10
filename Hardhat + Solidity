@@ -1,0 +1,71 @@
+
+import { ethers } from "hardhat";
+
+async function main() {
+    // Получаем аккаунт, который будет платить
+    const [deployer] = await ethers.getSigners();
+    console.log("Деплоим контракты с аккаунта:", deployer.address);
+    const BrickFactory = await ethers.getContractFactory("Bricks");
+    const brickContract = await BrickFactory.deploy();
+
+    //Ждем, пока контракт запишется
+    await brickContract.waitForDeployment();
+    const brickAddress = await brickContract.getAddress();
+    console.log(" BrickToken развернут по адресу:", brickAddress);
+//мыло
+    const SoapFactory = await ethers.getContractFactory("Soap");
+    const soapContract = await SoapFactory.deploy();
+    await soapContract.waitForDeployment();
+
+    // Тоже сохраняем адрес в строку
+    const soapAddress = await soapContract.getAddress();
+    console.log(" SoapToken развернут по адресу:", soapAddress);
+//обменник
+    const ExchangeFactory = await ethers.getContractFactory("BarterExchange");
+    // В конструктор передаем наши переменные
+    const exchangeContract = await ExchangeFactory.deploy(brickAddress, soapAddress);
+    await exchangeContract.waitForDeployment();
+    const exchangeAddress = await exchangeContract.getAddress();
+    console.log(" BarterExchange развернут по адресу:", exchangeAddress);
+//мыло
+    console.log(" Начисляем мыло на контракт обменника");
+
+    const amountSoap = 1_000;
+    const trans = await soapContract.mint(exchangeAddress, amountSoap);
+    await trans.wait();
+//
+    console.log(`Успешно начислено ${amountSoap} мыла!`);
+    console.log("\n НАЧИНАЕМ ТЕСТ ОБМЕНА ");
+
+    // Дадим ему кирпичей 100
+    await (await brickContract.mint(deployer.address, 1000)).wait();
+    console.log(`1. Пользователь получил:  1000  кирпичей.`);
+
+    // Пользователь должен РАЗРЕШИТЬ обменнику забрать 10 кирпичей
+    await (await brickContract.allow(exchangeAddress, 10)).wait();
+    console.log("2. Пользователь дал разрешение на 10 кирпичей.");
+
+
+    // Меняем 10 кирпичей. Если курс 10 к 1, мы должны получить 1 мыло.
+    console.log("3. Выполняем обмен кирпичей на мыло");
+    await (await exchangeContract.exchangeBricksForSoap(10)).wait();
+
+    console.log("\n РЕЗУЛЬТАТЫ ");
+
+    const userBricks = await brickContract.balanceOf(deployer.address);
+    const userSoap = await soapContract.balanceOf(deployer.address);
+
+    console.log(`Кирпичей у пользователя: ${userBricks}`);
+    console.log(`Мыла у пользователя:     ${userSoap} `);
+
+    if (userSoap == 1n && userBricks == 990n) {
+        console.log(" УСПЕХ: Обмен прошел корректно!");
+    } else {
+        console.log(" ОШИБКА: Балансы не сходятся.");
+    }
+}
+
+main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+});
