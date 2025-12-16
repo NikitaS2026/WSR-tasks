@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "./Bricks.sol";
+import "./Soap.sol";
+import "./IExchangePair.sol";
+
+contract BrickSoapPair is IExchangePair {
+
+    ERC20 private token1;
+    ERC20 private token2;
+    uint256 public rate;
+
+    constructor(address _token1Address, address _token2Address,uint256 _rate) {
+        token1 = ERC20(_token1Address);
+        token2 = ERC20(_token2Address);
+        rate = _rate;
+    }
+
+    //override -переписываем пустую функцию из интерфейса.
+    function exchange(address user, uint256 amount) public  override returns (uint256) {
+        // amount-кирпичи
+        require(amount % rate == 0, "Error: Amount must be divisible by rate");
+        uint256 token2Amount = amount / rate;
+
+        //Вместо msg.sender используем user -потому что функцию может вызвать жругой полльзователь.
+        token1.transferFrom(user, address(this), amount);
+        token2.transfer(user, token2Amount);
+        return token2Amount;
+    }
+}
