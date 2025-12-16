@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "./BrickSoapPair.sol"; // Подключаем новое универсальное шасси
+import "./IExchangePair.sol";
+
+contract Factory {
+    mapping(address => address) public getPair;
+
+    function createPair(address tokenA, address tokenB, uint256 rate) external {
+        BrickSoapPair newPair = new BrickSoapPair(tokenA, tokenB, rate);
+        getPair [tokenA] = address(newPair);
+    }
+
+    function executeTrade(address tokenA, uint256 amount) external {
+        address pairAddress = getPair[tokenA];
+        require(pairAddress != address(0), "No pair found");
+        
+        IExchangePair pair = IExchangePair(pairAddress);
+        pair.exchange(msg.sender, amount);
+    }
+
+}
