@@ -1,0 +1,86 @@
+import hre from "hardhat";
+import "@nomicfoundation/hardhat-ethers/internal/type-extensions";
+
+import { ethers } from "hardhat";
+
+async function main() {
+    const [deployer] = await ethers.getSigners();
+    console.log("Деплоер :", deployer.address);
+
+    //фактори
+    const Factory = await ethers.getContractFactory("Factory");
+    const factory = await Factory.deploy();
+    await factory.waitForDeployment();
+    console.log("\n Главная фабрика:", await factory.getAddress());
+
+
+    //товары
+    const TokenFactory = await ethers.getContractFactory("ERC20");
+
+    // Пара №1: Валюты
+    const sgk = await TokenFactory.deploy("SGK Token", "SGK",18);
+    const pgk = await TokenFactory.deploy("PGK Token", "PGK",18);
+
+    // Пара №2: Техника
+    const moskvich = await TokenFactory.deploy("Moskvich 3", "M-3",18);
+    const tank = await TokenFactory.deploy("T-90 Tank", "TANK",18);
+
+    await Promise.all([sgk.waitForDeployment(), pgk.waitForDeployment(), moskvich.waitForDeployment(), tank.waitForDeployment()]);
+    console.log("Валюты: СГК, ПГК, Москвич, Танк");
+    //10 СГК меняем на 1 ПГК.
+    console.log("\n Создаем пару: СГК -> ПГК (Курс 2)");
+    await factory.createPair(await sgk.getAddress(), await pgk.getAddress(), 2);
+    const pairSgkAddress = await factory.getPair(await sgk.getAddress());
+
+    //Москвич 3 по цене 10 танков.
+    console.log(" Создаем пару: Москвич 3 -> Танки (Курс 10)");
+    await factory.createPair(await moskvich.getAddress(), await tank.getAddress(), 10);
+    const pairAutoAddress = await factory.getPair(await moskvich.getAddress());
+
+    //ПГК, чтобы выдавать их за СГК
+    await pgk.mint(pairSgkAddress, 1000);
+    //Танки, чтобы выдавать их за Москвичи
+    await tank.mint(pairAutoAddress, 500);
+
+    console.log("\n Ликвидность (ПГК и Танки) загружена в обменники.");
+    // Дадим юзеру 10 СГК и 1 Москвич
+    await sgk.mint(deployer.address, 10);
+    await moskvich.mint(deployer.address, 10);
+    console.log("👤 Олежка получил: 10 СГК и 1 Москвич.");
+
+
+    console.log("\n СДЕЛКА 1: Меняем СГК на ПГК ");
+
+    //Апрув (Разрешаем обменнику забрать наши СГК)
+    await sgk.allow(pairSgkAddress, 10);
+
+    await factory.executeTrade(await sgk.getAddress(), 10);
+    console.log(" Сделка прошла!");
+
+
+    console.log("\nСДЕЛКА 2: Сдаем Москвич в Trade-In ");
+
+    // Апрув (Разрешаем забрать Москвич)
+    await moskvich.allow(pairAutoAddress, 10);
+    //Обмен
+    await factory.executeTrade(await moskvich.getAddress(), 10);
+    console.log(" Сделка прошла!");
+
+
+    console.log("\n Итоговые балансы Олежки:");
+
+    const balSgk = await sgk.balanceOf(deployer.address);
+    const balPgk = await pgk.balanceOf(deployer.address);
+    const balCar = await moskvich.balanceOf(deployer.address);
+    const balTank = await tank.balanceOf(deployer.address);
+
+    console.log(`СГК:      ${balSgk} `);//Было 10, должно стать 0
+    console.log(`ПГК:      ${balPgk} `);//Должно получиться 20, т.к. курс 2
+    console.log(`Москвичи: ${balCar} `);//было 1 ,обменяли
+    console.log(`Танки:    ${balTank} `);//должны получить 10, т.к. курс 10
+}
+
+main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+});
